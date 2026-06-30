@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: mxcube
+      POSTGRES_USER: mxcube
+      POSTGRES_PASSWORD: mxcube
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+
+  backend:
+    build:
+      context: ../backend
+    environment:
+      MXCUBE_DATABASE_URL: postgresql+asyncpg://mxcube:mxcube@postgres:5432/mxcube
+      MXCUBE_CORS_ORIGINS: '["http://localhost:5173"]'
+      MXCUBE_LOG_READER_MODE: fixture
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ../frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+
