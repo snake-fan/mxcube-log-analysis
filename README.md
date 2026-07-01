@@ -14,10 +14,16 @@ Backend:
 
 ```bash
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-uvicorn app.main:app --reload
+uv sync --dev
+uv run uvicorn app.main:app --reload
+```
+
+Backend checks:
+
+```bash
+cd backend
+uv run pytest
+uv run ruff check app tests
 ```
 
 Frontend:
